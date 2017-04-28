@@ -148,8 +148,6 @@ TARGET_CPU_LEGACY_LIB := $(ARCH)
 TARGET_C_FLAGS = -fPIC $(CFLAGS) -Wno-psabi -DJAVACALL_REPORT_LEVEL=4 -DENABLE_DEVICEACCESS -c -MMD -MF $(NATIVE_OUT_DIR)/$(@).d
 TARGET_INCLUDES := $(foreach d,$(DIO_INCLUDE_DIRS),-I$(d)) -I$(JAVA_HOME)/include -I$(JAVA_HOME)/include/linux
 TARGET_CXX_FLAGS := -fPIC $(CXXFLAGS) -Wno-psabi -DJAVACALL_REPORT_LEVEL=4 -DENABLE_DEVICEACCESS -c
-TARGET_LD_FLAGS:= \
-          -shared -Wl \
 
 ALL_TARGETS := dirs $(LIB_NAME).jar lib$(LIB_NAME).so device-io
 
@@ -189,7 +187,7 @@ $(C_OBJ_FILES): %.o: %.c dirs
 
 lib$(LIB_NAME).so: $(CPP_OBJ_FILES) $(C_OBJ_FILES) dirs
 	@echo linking $@
-	@$(TARGET_LD) $(TARGET_LD_FLAGS) -o $(SO_OUT_DIR)/$@ $(foreach o,$(CPP_OBJ_FILES) $(C_OBJ_FILES),$(NATIVE_OUT_DIR)/$(o))
+	@$(TARGET_LD) --shared -Wl,--soname,$@.0 -o $(SO_OUT_DIR)/$@ $(foreach o,$(CPP_OBJ_FILES) $(C_OBJ_FILES),$(NATIVE_OUT_DIR)/$(o))
 
 $(LIB_NAME).jar: $(JAVA_SRC_FILES) dirs
 	@echo Compiling Java source files to $(JAR_OUT_DIR)/$@
